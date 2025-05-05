@@ -1,0 +1,29 @@
+name: Alpine GUI Workflow
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Or your preferred runner
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Alpine environment
+      uses: jirutka/setup-alpine@v1
+      with:
+        branch: latest-stable
+
+    - name: Install GUI
+      run: |
+        apk add --update xorg-server xorg-server-xvfb xorg-server-Xnest xfce4 xfce4-terminal lightdm-gtk-greeter xf86-video-vesa xf86-input-mouse xf86-input-keyboard tigervnc
+
+    - name: Start VNC
+      run: |
+        vncserver -geometry 1280x1024 -depth 24 -SecurityProtocol 2 &
+
+    - name: (Optional) Show VNC password
+      run: echo "VNC password: $(cat /home/vncserver/vncpasswd)" # Replace with actual path
+      if: success()
